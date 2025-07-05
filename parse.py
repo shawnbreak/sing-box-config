@@ -12,18 +12,23 @@ import json
 config_temp = "./sing-box_1.11.json"
 
 with open("orig", "r") as f:
-    result = f.read().rstrip('\n')
+    raw = f.read().rstrip('\n')
 
-result = base64.b64decode(result.encode("utf-8")).decode("utf-8")
-result = result.split("\n")
+padding = len(raw) % 4
+if padding:
+    raw += "=" * (4 - padding)
 
-pattern = re.compile("(.*)://(.*)@(.*):(.*)#(.*)")
+decode_str = base64.b64decode(raw.encode("utf-8")).decode("utf-8")
+decode_lines = decode_str.split("\n")
+
+pattern_ss = re.compile("(.*)://(.*)@(.*):(.*)#(.*)")
+pattern_vmess = re.compile("(.*)://(.*)")
 outbounds = []
 outbound_tags = []
-for line in result:
-    if line:
+for line in decode_lines:
+    if line and line.startswith("ss"):
         r = urllib.parse.unquote(line)
-        match = pattern.match(r)
+        match = pattern_ss.match(r)
         otype = match.group(1)
         method_and_pwd = match.group(2)
         url = match.group(3)
@@ -42,6 +47,36 @@ for line in result:
         }
         outbounds.append(outbound)
         outbound_tags.append(tag)
+    elif line and line.startswith("vmess"):
+        match = pattern_vmess.match(line)
+        otype = match.group(1)
+        content_raw = match.group(2)
+        content = base64.b64decode(content_raw).decode("utf-8")
+        content = json.loads(content)
+        host = content["host"]
+        add = content["add"]
+        id = content["id"]
+        net = content["net"]
+        path = content["path"]
+        port = int(content["port"])
+        ps = content["ps"]
+        aid = content["aid"]
+        outbound = {
+                "type": otype,
+                "tag": ps,
+                "alter_id": aid,
+                "network": "tcp",
+                "security": "auto",
+                "server": add,
+                "server_port": port,
+                "transport": {
+                    "path": path,
+                    "type": net
+                },
+                "uuid": id
+        }
+        outbounds.append(outbound)
+        outbound_tags.append(ps)
 
 #print(json.dumps(outbounds, ensure_ascii=False, indent=4))
 #print(json.dumps(outbound_tags, ensure_ascii=False, indent=4))
