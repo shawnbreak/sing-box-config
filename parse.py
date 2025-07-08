@@ -123,8 +123,10 @@ def parse_lines(decode_lines: List[str]) -> Tuple[List[dict], List[str]]:
             outbound, tag = _parse_ss(line)
         elif line and line.startswith("vmess"):
             outbound, tag = _parse_vmess(line)
-        outbounds.append(outbound)
-        outbound_tags.append(tag)
+
+        if tag not in outbound_tags:
+            outbounds.append(outbound)
+            outbound_tags.append(tag)
     return outbounds, outbound_tags
 
 
@@ -158,6 +160,9 @@ def main():
     raw = check_pad(raw)
     lines = decode_as_lines(raw)
     outbounds, outbound_tags = parse_lines(lines)
+    count = len(outbound_tags)
+    logger.info(f"total nodes: {count}")
+    logger.info(outbound_tags)
     template = read_template(config_temp)
     result = fill_template(template, outbounds, outbound_tags)
     write_config(config_result, result)
