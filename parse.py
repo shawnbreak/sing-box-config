@@ -5,13 +5,44 @@ import base64
 import urllib.parse
 import re
 import json
+import argparse
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+logger.info("start parse")
 
 # sing-box examples
 # https://github.com/chika0801/sing-box-examples
-
 config_temp = "./sing-box_1.11.json"
+cache_file=".cache_content"
+cache_url=".cache_url"
 
-with open("orig", "r") as f:
+parse = argparse.ArgumentParser(
+        prog="parse",
+        description="sing box parse"
+        )
+
+parse.add_argument("--url")
+parse.add_argument("--update", action='store_true', default=False)
+args = parse.parse_args()
+
+if args.url:
+    logger.info("cache url")
+    with open(cache_url, "w") as f:
+        f.write(args.url)
+
+with open(cache_url, "r") as f:
+    url = f.read()
+
+if args.update:
+    logger.info("update content")
+    res = requests.get(url)
+    with open(cache_file, "w") as f:
+        f.write(res.text)
+
+with open(cache_file, "r") as f:
     raw = f.read().rstrip('\n')
 
 padding = len(raw) % 4
