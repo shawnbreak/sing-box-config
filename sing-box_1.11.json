@@ -1,7 +1,7 @@
 {
   "log": {
     "disabled": false,
-    "level": "error",
+    "level": "info",
     "timestamp": true
   },
   "experimental": {
@@ -52,7 +52,7 @@
         "tag": "block"
       }
     ],
-    "strategy": "prefer_ipv4"
+    "strategy": "ipv4_only"
   },
   "route": {
     "auto_detect_interface": true,
