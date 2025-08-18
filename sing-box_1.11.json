@@ -80,6 +80,14 @@
         "outbound": "direct"
       },
       {
+        "domain_suffix": [
+            "linx-info.com",
+            "shawnbreak.top"
+        ],
+        "outbound": "direct"
+
+      },
+      {
         "ip_is_private": true,
         "outbound": "direct"
       },
