@@ -1,0 +1,9 @@
+[project]
+name = "sing-box-config"
+version = "0.1.0"
+description = "parse subscription config content to sing-box format"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests>=2.32.5",
+]

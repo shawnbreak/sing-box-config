@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import sys
 from typing import List, Tuple
 import requests
 import base64
@@ -10,7 +11,7 @@ import argparse
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 logger.info("start parse")
 
@@ -20,6 +21,10 @@ config_temp = "./sing-box_1.11.json"
 config_result = "config.json"
 cache_file=".cache_content"
 cache_url=".cache_url"
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+        }
 
 def parse_args() -> Tuple[str, bool]:
     parse = argparse.ArgumentParser(
@@ -42,8 +47,12 @@ def get_sub_raw(update: bool, url: str):
         url = f.read()
 
     if update:
-        logger.info("update content")
-        res = requests.get(url)
+        logger.info(f"update content from {url}")
+        res = requests.get(url, headers=headers)
+        if res.status_code != 200:
+            print(f"ERROR: http status code: {res.status_code}")
+            print(res.text)
+            sys.exit(1)
         with open(cache_file, "w") as f:
             f.write(res.text)
 
