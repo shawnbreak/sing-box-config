@@ -87,6 +87,23 @@
         "outbound": "direct"
 
       },
+        {
+            "domain": [
+                "mail.linx-info.com",
+                "oa.linx-info.com",
+                "odoo.linx-info.com",
+                "ff.cd.linx"
+            ],
+            "outbound": "direct"
+        },
+        {
+            "domain": [
+                "claude.com",
+                "claude.ai",
+                "gemini.google.com"
+            ],
+            "outbound": "ai"
+        },
       {
         "ip_is_private": true,
         "outbound": "direct"
@@ -148,6 +165,11 @@
     {
       "type": "selector",
       "tag": "proxy",
+      "outbounds": []
+    },
+    {
+      "type": "selector",
+      "tag": "ai",
       "outbounds": []
     },
     {

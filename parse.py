@@ -152,6 +152,8 @@ def fill_template(template: dict, outbounds: List[dict], outbound_tags: List[str
             o["outbounds"] = outbound_tags
         if o["tag"] == "auto":
             o["outbounds"] = outbound_tags
+        if o["tag"] == "ai":
+            o["outbounds"] = [i for i in  outbound_tags if not "香港" in i and not "台湾" in i]
 
     for o in outbounds:
         temp_outbounds.append(o)
