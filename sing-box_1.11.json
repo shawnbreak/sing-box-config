@@ -185,11 +185,6 @@
       "outbounds": []
     },
     {
-      "type": "selector",
-      "tag": "ai",
-      "outbounds": []
-    },
-    {
       "type": "direct",
       "tag": "direct"
     }
