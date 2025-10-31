@@ -73,6 +73,15 @@
         "outbound": "proxy"
       },
       {
+        "domain_suffix": [
+            "openai.com",
+            "chatgpt.com",
+            "gemini.google.com",
+            "claude.ai"
+        ],
+        "outbound": "ai"
+      },
+      {
         "rule_set": [
             "geosite-cn",
             "geoip-cn"
@@ -80,12 +89,14 @@
         "outbound": "direct"
       },
       {
-        "domain_suffix": [
-            "linx-info.com",
-            "shawnbreak.top"
+        "domain": [
+            "oa.linx-info.com",
+            "oax.linx-info.com",
+            "mail.linx-info.com",
+            "ff.cd.linx",
+            "xt.rd.in.linx"
         ],
         "outbound": "direct"
-
       },
         {
             "domain": [
@@ -159,6 +170,12 @@
     {
       "type": "urltest",
       "tag": "auto",
+      "interval": "3m",
+      "outbounds": []
+    },
+    {
+      "type": "urltest",
+      "tag": "ai",
       "interval": "3m",
       "outbounds": []
     },
