@@ -145,6 +145,7 @@ def read_template(template_file: str) -> dict:
     return temp
 
 
+ai_exclude_tag_pattern = [ "香港", "台湾", "菲律宾" ]
 def fill_template(template: dict, outbounds: List[dict], outbound_tags: List[str]) -> dict:
     temp_outbounds = template["outbounds"]
     for o in temp_outbounds:
@@ -153,7 +154,17 @@ def fill_template(template: dict, outbounds: List[dict], outbound_tags: List[str
         if o["tag"] == "auto":
             o["outbounds"] = outbound_tags
         if o["tag"] == "ai":
-            o["outbounds"] = [ t for t in  outbound_tags if "香港" not in t and "台湾" not in t ]
+            ai_tags = []
+            for t in outbound_tags:
+                t_ok = True
+                for et in ai_exclude_tag_pattern:
+                    if et in t:
+                        t_ok = False
+                        break
+                if t_ok:
+                    ai_tags.append(t)
+
+            o["outbounds"] = ai_tags
 
     for o in outbounds:
         temp_outbounds.append(o)
