@@ -107,7 +107,7 @@ def _parse_vmess(line: str) -> Tuple[dict, str]:
     path = content["path"]
     port = int(content["port"])
     ps = content["ps"]
-    aid = content["aid"]
+    aid = int(content["aid"])
     outbound = {
             "type": otype,
             "tag": ps,
@@ -132,6 +132,9 @@ def parse_lines(decode_lines: List[str]) -> Tuple[List[dict], List[str]]:
             outbound, tag = _parse_ss(line)
         elif line and line.startswith("vmess"):
             outbound, tag = _parse_vmess(line)
+        else:
+            logger.warning(f"cannot parse {line}")
+            continue
 
         if tag not in outbound_tags:
             outbounds.append(outbound)
