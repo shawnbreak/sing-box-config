@@ -17,7 +17,7 @@ logger.info("start parse")
 
 # sing-box examples
 # https://github.com/chika0801/sing-box-examples
-config_temp = "./sing-box_1.11.json"
+config_temp = "./sing-box_1.13.json"
 config_result = "config.json"
 cache_file=".cache_content"
 cache_url=".cache_url"
@@ -84,12 +84,13 @@ def _parse_ss(line: str) -> Tuple[dict, str]:
     method = method_and_pwd[0]
     pwd = method_and_pwd[1]
     outbound = {
-            "type": "shadowsocks" if otype == "ss" else otype,
-            "tag": tag,
-            "server": url,
-            "server_port": int(port),
-            "method": method,
-            "password": pwd
+        "type": "shadowsocks" if otype == "ss" else otype,
+        "tag": tag,
+        "server": url,
+        "server_port": int(port),
+        "method": method,
+        "password": pwd,
+        "domain_resolver": "local-dns"
     }
     return outbound, tag
 
@@ -153,7 +154,10 @@ def fill_template(template: dict, outbounds: List[dict], outbound_tags: List[str
     temp_outbounds = template["outbounds"]
     for o in temp_outbounds:
         if o["tag"] == "proxy":
-            o["outbounds"] = outbound_tags
+            o["outbounds"] = ["auto"]
+            for t in  outbound_tags:
+                o["outbounds"].append(t)
+
         if o["tag"] == "auto":
             o["outbounds"] = outbound_tags
         if o["tag"] == "ai":

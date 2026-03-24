@@ -1,0 +1,148 @@
+{
+    "log": {
+	"disabled": false,
+	"level": "info",
+	"timestamp": true
+    },
+    "experimental": {
+	"cache_file": {
+	    "enabled": true
+	},
+	"clash_api": {
+	    "external_controller": "127.0.0.1:9090",
+	    "external_ui": "dashboard"
+	}
+    },
+    "dns": {
+        "servers": [
+            {
+		"tag": "remote-dns",
+                "type": "https",
+		"detour": "direct",
+                "server": "1.1.1.1"
+            },
+            {
+                "tag": "local-dns",
+                "type": "udp",
+		"detour": "direct",
+                "server": "223.5.5.5"
+            }
+        ],
+        "strategy": "ipv4_only"
+    },
+    "route": {
+	"auto_detect_interface": true,
+	"default_domain_resolver": "remote-dns",
+	"final": "proxy",
+	"rules": [
+	    {
+		"ip_is_private": true,
+		"outbound": "direct"
+	    },
+	    {
+		"rule_set": [
+                    "geosite-cn",
+                    "geoip-cn"
+                ],
+		"outbound": "direct"
+	    },
+	    {
+		"domain": [
+                    "oa.linx-info.com",
+                    "oax.linx-info.com",
+                    "mail.linx-info.com",
+                    "ff.cd.linx",
+                    "xt.rd.in.linx"
+                ],
+		"action": "route",
+		"outbound": "direct"
+	    },
+            {
+                "domain_suffix": [
+                    "openai.com",
+                    "chatgpt.com",
+                    "gemini.google.com",
+                    "claude.ai"
+                ],
+		"action": "route",
+                "outbound": "ai"
+            },
+	    {
+                "clash_mode": "Direct",
+		"action": "route",
+                "outbound": "direct"
+            },
+            {
+                "clash_mode": "Proxy",
+		"action": "route",
+                "outbound": "proxy"
+            }
+	],
+	"rule_set": [
+	    {
+		"tag": "geosite-cn",
+		"type": "remote",
+		"format": "binary",
+		"url": "https://fastly.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-cn.srs",
+		"download_detour": "direct"
+	    },
+	    {
+		"tag": "geoip-cn",
+		"type": "remote",
+		"format": "binary",
+		"url": "https://fastly.jsdelivr.net/gh/SagerNet/sing-geoip@rule-set/geoip-cn.srs",
+		"download_detour": "direct"
+	    },
+	    {
+		"tag": "category-ads-all",
+		"type": "remote",
+		"format": "binary",
+		"url": "https://fastly.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-category-ads-all.srs",
+		"download_detour": "direct"
+	    }
+	]
+    },
+    "inbounds": [
+        {
+            "type": "tun",
+            "tag": "tun-in",
+            "address": [
+                "172.18.0.1/30"
+            ],
+            "auto_route": true,
+            "strict_route": true
+        },
+        {
+            "type": "mixed",
+            "tag": "mixed-in",
+            "listen": "127.0.0.1",
+            "listen_port": 2333,
+            "users": [],
+	    "set_system_proxy": true
+        }
+    ],
+    "outbounds": [
+	{
+	    "type": "urltest",
+	    "tag": "auto",
+	    "interval": "10m",
+	    "outbounds": []
+	},
+	{
+	    "type": "urltest",
+	    "tag": "ai",
+	    "interval": "3m",
+	    "outbounds": []
+	},
+	{
+	    "type": "selector",
+	    "tag": "proxy",
+	    "outbounds": ["auto"]
+	},
+	{
+	    "type": "direct",
+	    "tag": "direct",
+	    "domain_resolver": "local-dns"
+	}
+    ]
+}
