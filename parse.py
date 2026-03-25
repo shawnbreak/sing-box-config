@@ -26,7 +26,7 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
 }
 
-def parse_args() -> Tuple[str, bool]:
+def parse_args() -> Tuple[str, bool, bool, bool]:
     parse = argparse.ArgumentParser(
         prog="parse",
         description="sing box parse"
@@ -34,8 +34,11 @@ def parse_args() -> Tuple[str, bool]:
 
     parse.add_argument("--url")
     parse.add_argument("--update", action='store_true', default=False)
+    parse.add_argument("--tun", action='store_true', default=False)
+    parse.add_argument("--mixed", action='store_true', default=False)
+    
     args = parse.parse_args()
-    return args.url, args.update
+    return args.url, args.update, args.tun, args.mixed
 
 def get_sub_raw(update: bool, url: str):
     if url:
@@ -149,7 +152,15 @@ def read_template(template_file: str) -> dict:
 
 
 ai_exclude_tag_pattern = [ "香港", "台湾", "菲律宾" ]
-def fill_template(template: dict, outbounds: List[dict], outbound_tags: List[str]) -> dict:
+def fill_template(template: dict, outbounds: List[dict], outbound_tags: List[str], tun: bool, mixed: bool) -> dict:
+    temp_inbounds = template["inbounds"]
+    inbounds = []
+    for i in temp_inbounds:
+        if i["type"] == "tun" and tun:
+            inbounds.append(i)
+        if i["type"] == "mixed" and mixed:
+            inbounds.append(i)
+    template["inbounds"] = inbounds
     temp_outbounds = template["outbounds"]
     for o in temp_outbounds:
         if o["tag"] == "proxy":
@@ -183,7 +194,7 @@ def write_config(config_result: str, template: dict):
         f.write(result)
 
 def main():
-    url, update = parse_args()
+    url, update, tun, mixed = parse_args()
     raw = get_sub_raw(update, url)
     raw = check_pad(raw)
     lines = decode_as_lines(raw)
@@ -192,7 +203,7 @@ def main():
     logger.info(f"total nodes: {count}")
     logger.info(outbound_tags)
     template = read_template(config_temp)
-    result = fill_template(template, outbounds, outbound_tags)
+    result = fill_template(template, outbounds, outbound_tags, tun, mixed)
     write_config(config_result, result)
 
 if __name__ == "__main__":

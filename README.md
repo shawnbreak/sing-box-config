@@ -41,17 +41,3 @@ app → 访问 IP
 → route.rule(国内IP)
 → direct
 ```
-
-
-# mixed socks5 and http proxy
-
-```json
-{
-	"type": "mixed",
-	"tag": "mixed-in",
-	"listen": "127.0.0.1",
-	"listen_port": 2333,
-	"users": [],
-	"set_system_proxy": false
-}
-```
