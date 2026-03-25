@@ -112,7 +112,11 @@
                 ],
 		"action": "route",
                 "outbound": "ai"
-            }
+            },
+	    {
+		"port": 22,
+		"outbound": "direct"
+	    }
 	],
 	"rule_set": [
 	    {
