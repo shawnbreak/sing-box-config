@@ -24,13 +24,13 @@ cache_url=".cache_url"
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-        }
+}
 
 def parse_args() -> Tuple[str, bool]:
     parse = argparse.ArgumentParser(
-            prog="parse",
-            description="sing box parse"
-            )
+        prog="parse",
+        description="sing box parse"
+    )
 
     parse.add_argument("--url")
     parse.add_argument("--update", action='store_true', default=False)
@@ -90,7 +90,6 @@ def _parse_ss(line: str) -> Tuple[dict, str]:
         "server_port": int(port),
         "method": method,
         "password": pwd,
-        "domain_resolver": "local-dns"
     }
     return outbound, tag
 
@@ -110,18 +109,18 @@ def _parse_vmess(line: str) -> Tuple[dict, str]:
     ps = content["ps"]
     aid = int(content["aid"])
     outbound = {
-            "type": otype,
-            "tag": ps,
-            "alter_id": aid,
-            "network": "tcp",
-            "security": "auto",
-            "server": add,
-            "server_port": port,
-            "transport": {
-                "path": path,
-                "type": net
-            },
-            "uuid": id
+        "type": otype,
+        "tag": ps,
+        "alter_id": aid,
+        "network": "tcp",
+        "security": "auto",
+        "server": add,
+        "server_port": port,
+        "transport": {
+            "path": path,
+            "type": net
+        },
+        "uuid": id
     }
     return outbound, ps
 

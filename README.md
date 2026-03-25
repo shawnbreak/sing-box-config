@@ -11,3 +11,47 @@ options:
   --update
 ```
 
+
+# Request google.com example
+
+```
+app → DNS请求
+→ route.rule(hijack-dns)
+→ dns.rule(final)
+→ detour = proxy
+→ 1.1.1.1 查询
+→ 返回国外 IP
+
+app → 访问 IP
+→ route.rule(非国内)
+→ proxy
+```
+
+
+# Request baidu.com example
+
+```
+app → DNS请求
+→ hijack-dns
+→ dns.rule(geosite-cn)
+→ detour = direct
+→ 国内 DNS 查询（你写的是 233.5.5.5，这里应该是 typo）
+
+app → 访问 IP
+→ route.rule(国内IP)
+→ direct
+```
+
+
+# mixed socks5 and http proxy
+
+```json
+{
+	"type": "mixed",
+	"tag": "mixed-in",
+	"listen": "127.0.0.1",
+	"listen_port": 2333,
+	"users": [],
+	"set_system_proxy": false
+}
+```
