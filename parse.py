@@ -74,6 +74,27 @@ def decode_as_lines(raw: str) -> List[str]:
     decode_lines = decode_str.split("\n")
     return decode_lines
 
+def _parse_anytls(parse_result: urllib.parse.ParseResult) -> Tuple[dict, str]:
+    #anytls://ba2d7144-2992-4383-8a8d-9b3983160424@id01.shanhai.cfd:14401/?type=tcp&insecure=0&fp=chrome&sni=id01.shanhai.sbs#%E5%8D%B0%E5%BA%A6%E5%B0%BC%E8%A5%BF%E4%BA%9A01%5B%E4%B8%93%E7%BA%BF%5D1.0
+    querys = urllib.parse.parse_qs(parse_result.query)
+    tag = urllib.parse.unquote(parse_result.fragment)
+    return {
+        "type": parse_result.scheme,
+        "tag":  tag,
+        "server": parse_result.hostname,
+	"server_port": int(parse_result.port),
+	"password": parse_result.username,
+	"tls": {
+	    "enabled": True,
+	    "server_name": querys.get("sni")[0],
+	    "utls": {
+		"enabled": True,
+		"fingerprint": "chrome"
+	    },
+	    "insecure": False
+	}
+    }, tag
+    
 def _parse_ss(line: str) -> Tuple[dict, str]:
     pattern_ss = re.compile("(.*)://(.*)@(.*):(.*)#(.*)")
     r = urllib.parse.unquote(line)
@@ -131,12 +152,21 @@ def parse_lines(decode_lines: List[str]) -> Tuple[List[dict], List[str]]:
     outbounds = []
     outbound_tags = []
     for line in decode_lines:
-        if line and line.startswith("ss"):
-            outbound, tag = _parse_ss(line)
-        elif line and line.startswith("vmess"):
-            outbound, tag = _parse_vmess(line)
-        else:
-            logger.warning(f"cannot parse {line}")
+        if not line:
+            continue
+        try:
+            parse_result: urllib.parse.ParseResult = urllib.parse.urlparse(line)
+            if parse_result.scheme == "ss":
+                outbound, tag = _parse_ss(line)
+            elif parse_result.scheme == "vmess":
+                outbound, tag = _parse_vmess(line)
+            elif parse_result.scheme == "anytls":
+                outbound, tag = _parse_anytls(parse_result)
+            else:
+                logger.warning(f"cannot parse {line}")
+                continue
+        except Exception as e:
+            logger.error(f"{e}")
             continue
 
         if tag not in outbound_tags:
