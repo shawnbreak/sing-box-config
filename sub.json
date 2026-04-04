@@ -1,0 +1,14 @@
+{
+    "subs": [
+	{
+	    "name": "byg",
+	    "sub_url": "your sub url",
+	    "active": false
+	},
+	{
+	    "name": "shanhai",
+	    "sub_url": "your sub url",
+	    "active": true
+	}
+    ]
+}
