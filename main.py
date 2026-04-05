@@ -10,6 +10,7 @@ import re
 import json
 import argparse
 import logging
+from sub_parsers import parsers
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -21,9 +22,6 @@ logger.info("start parse")
 config_temp = "./sing-box_1.13.json"
 config_result = "config.json"
 sub_config = "./sub.json"
-
-cache_file=".cache_content"
-cache_url=".cache_url"
 
 ai_exclude_tag_pattern = [ "香港", "台湾", "菲律宾" ]
 
@@ -64,6 +62,10 @@ def get_sub_raw(sub_name: str, url: str, update: bool):
         return raw
 
 def check_pad(raw: str) -> str:
+    """
+    base64 encoded string's length should divided by 4, if not enough, padding with =
+    some subsccription will ignore trailing =, so we check and add the pad.
+    """
     padding = len(raw) % 4
     if padding:
         raw += "=" * (4 - padding)
@@ -74,79 +76,6 @@ def decode_as_lines(raw: str) -> List[str]:
     decode_lines = decode_str.split("\n")
     return decode_lines
 
-def _parse_anytls(parse_result: urllib.parse.ParseResult) -> Tuple[dict, str]:
-    #anytls://ba2d7144-2992-4383-8a8d-9b3983160424@id01.shanhai.cfd:14401/?type=tcp&insecure=0&fp=chrome&sni=id01.shanhai.sbs#%E5%8D%B0%E5%BA%A6%E5%B0%BC%E8%A5%BF%E4%BA%9A01%5B%E4%B8%93%E7%BA%BF%5D1.0
-    querys = urllib.parse.parse_qs(parse_result.query)
-    tag = urllib.parse.unquote(parse_result.fragment)
-    return {
-        "type": parse_result.scheme,
-        "tag":  tag,
-        "server": parse_result.hostname,
-	"server_port": int(parse_result.port),
-	"password": parse_result.username,
-	"tls": {
-	    "enabled": True,
-	    "server_name": querys.get("sni")[0],
-	    "utls": {
-		"enabled": True,
-		"fingerprint": "chrome"
-	    },
-	    "insecure": False
-	}
-    }, tag
-    
-def _parse_ss(line: str) -> Tuple[dict, str]:
-    pattern_ss = re.compile("(.*)://(.*)@(.*):(.*)#(.*)")
-    r = urllib.parse.unquote(line)
-    match = pattern_ss.match(r)
-    otype = match.group(1)
-    method_and_pwd = match.group(2)
-    url = match.group(3)
-    port = match.group(4)
-    tag = match.group(5).rstrip("\r")
-    method_and_pwd = base64.b64decode(method_and_pwd.encode("utf-8")).decode("utf-8").split(":")
-    method = method_and_pwd[0]
-    pwd = method_and_pwd[1]
-    outbound = {
-        "type": "shadowsocks" if otype == "ss" else otype,
-        "tag": tag,
-        "server": url,
-        "server_port": int(port),
-        "method": method,
-        "password": pwd,
-    }
-    return outbound, tag
-
-def _parse_vmess(line: str) -> Tuple[dict, str]:
-    pattern_vmess = re.compile("(.*)://(.*)")
-    match = pattern_vmess.match(line)
-    otype = match.group(1)
-    content_raw = match.group(2)
-    content = base64.b64decode(content_raw).decode("utf-8")
-    content = json.loads(content)
-    host = content["host"]
-    add = content["add"]
-    id = content["id"]
-    net = content["net"]
-    path = content["path"]
-    port = int(content["port"])
-    ps = content["ps"]
-    aid = int(content["aid"])
-    outbound = {
-        "type": otype,
-        "tag": ps,
-        "alter_id": aid,
-        "network": "tcp",
-        "security": "auto",
-        "server": add,
-        "server_port": port,
-        "transport": {
-            "path": path,
-            "type": net
-        },
-        "uuid": id
-    }
-    return outbound, ps
 
 def parse_lines(decode_lines: List[str]) -> Tuple[List[dict], List[str]]:
     outbounds = []
@@ -154,16 +83,14 @@ def parse_lines(decode_lines: List[str]) -> Tuple[List[dict], List[str]]:
     for line in decode_lines:
         if not line:
             continue
+        
         try:
             parse_result: urllib.parse.ParseResult = urllib.parse.urlparse(line)
-            if parse_result.scheme == "ss":
-                outbound, tag = _parse_ss(line)
-            elif parse_result.scheme == "vmess":
-                outbound, tag = _parse_vmess(line)
-            elif parse_result.scheme == "anytls":
-                outbound, tag = _parse_anytls(parse_result)
+            parser = parsers.get(parse_result.scheme)
+            if parser:
+                outbound, tag = parser(parse_result)
             else:
-                logger.warning(f"cannot parse {line}")
+                logger.warning(f"cannot parse {parse_result.scheme}")
                 continue
         except Exception as e:
             logger.error(f"{e}")

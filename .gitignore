@@ -1,2 +1,3 @@
 .cache_*
 config.json
+__pycache__
