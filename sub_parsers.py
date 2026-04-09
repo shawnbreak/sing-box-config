@@ -1,4 +1,5 @@
 import urllib
+import base64
 
 def _parse_anytls(parse_result: urllib.parse.ParseResult) -> tuple[dict, str]:
     #anytls://ba2d7144-2992-4383-8a8d-9b3983160424@id01.shanhai.cfd:14401/?type=tcp&insecure=0&fp=chrome&sni=id01.shanhai.sbs#%E5%8D%B0%E5%BA%A6%E5%B0%BC%E8%A5%BF%E4%BA%9A01%5B%E4%B8%93%E7%BA%BF%5D1.0
