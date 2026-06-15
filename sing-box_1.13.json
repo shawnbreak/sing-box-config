@@ -29,9 +29,10 @@
             },
             {
                 "tag": "local-dns",
-                "type": "https",
-		"detour": "direct",
-                "server": "223.5.5.5"
+                "type": "local"
+                // "type": "https",
+		// "detour": "direct",
+                // "server": "223.5.5.5"
             }
         ],
 	"rules": [
@@ -44,6 +45,7 @@
 	    },
 	    {
 		"domain": [
+		    "www.openeuler.com",
                     "oa.linx-info.com",
                     "oax.linx-info.com",
                     "mail.linx-info.com",
@@ -95,6 +97,7 @@
 	    },
 	    {
 		"domain": [
+		    "www.openeuler.com",
                     "oa.linx-info.com",
                     "oax.linx-info.com",
                     "mail.linx-info.com",

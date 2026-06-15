@@ -2,13 +2,13 @@
     "subs": [
 	{
 	    "name": "byg",
-	    "sub_url": "your sub url",
-	    "active": false
+	    "sub_url": "https://bp31qu6dea.qinyues4.cc/8fe13ca8e9c11b82ac3b1d6afed46558",
+	    "active": true
 	},
 	{
 	    "name": "shanhai",
-	    "sub_url": "your sub url",
-	    "active": true
+	    "sub_url": "https://sub01.sh-cloudflare.sbs:8443/api/v1/client/subscribe?token=0cefdee38001ec0befcf2cba4b9dc148",
+	    "active": false
 	}
     ]
 }
