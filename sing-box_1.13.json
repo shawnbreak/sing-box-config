@@ -30,9 +30,6 @@
             {
                 "tag": "local-dns",
                 "type": "local"
-                // "type": "https",
-		// "detour": "direct",
-                // "server": "223.5.5.5"
             }
         ],
 	"rules": [
@@ -86,6 +83,15 @@
 	    },
 	    {
 		"ip_is_private": true,
+		"outbound": "direct"
+	    },
+	    {
+		"process_name": [
+		    "thunderbird"
+		],
+		"process_path": [
+		    "/usr/bin/thunderbird"
+		],
 		"outbound": "direct"
 	    },
 	    {
