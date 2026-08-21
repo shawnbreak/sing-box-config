@@ -48,7 +48,11 @@
                     "mail.linx-info.com",
                     "ff.cd.linx",
                     "xt.rd.in.linx",
-		    "immich.shawnbreak.top"
+		    "immich.shawnbreak.top",
+		    "rd-server.rd.in.linx",
+		    "icp.rd.in.linx",
+		    "itgitlab.rd.in.linx",
+		    "doc.cd.in.linx"
 		],
 		"server": "local-dns"
 	    },
@@ -108,7 +112,11 @@
                     "oax.linx-info.com",
                     "mail.linx-info.com",
                     "ff.cd.linx",
-                    "xt.rd.in.linx"
+                    "xt.rd.in.linx",
+		    "rd-server.rd.in.linx",
+		    "icp.rd.in.linx",
+		    "itgitlab.rd.in.linx",
+		    "doc.cd.in.linx"
                 ],
 		"action": "route",
 		"outbound": "direct"
