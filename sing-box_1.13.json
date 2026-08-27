@@ -61,7 +61,7 @@
                     "openai.com",
                     "chatgpt.com",
                     "gemini.google.com",
-                    "claude.ai" 
+                    "claude.ai"
                 ],
                 "server": "ai-dns"
             },
@@ -113,6 +113,7 @@
                     "mail.linx-info.com",
                     "ff.cd.linx",
                     "xt.rd.in.linx",
+		    "immich.shawnbreak.top",
 		    "rd-server.rd.in.linx",
 		    "icp.rd.in.linx",
 		    "itgitlab.rd.in.linx",
