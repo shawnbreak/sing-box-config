@@ -6,7 +6,8 @@
     },
     "experimental": {
 	"cache_file": {
-	    "enabled": true
+	    "enabled": true,
+	    "store_dns": true
 	},
 	"clash_api": {
 	    "external_controller": "127.0.0.1:9090",
@@ -81,7 +82,9 @@
 	    }
 	],
 	"final": "remote-dns",
-        "strategy": "ipv4_only"
+        "strategy": "ipv4_only",
+        "optimistic": true,
+        "timeout": "5s"
     },
     "route": {
 	"auto_detect_interface": true,
@@ -187,7 +190,8 @@
 	    ],
             "auto_route": true,
 	    "auto_redirect": true,
-            "strict_route": false
+            "strict_route": false,
+	    "dns_mode": "hijack"
         },
 	{
 	    "type": "mixed",
