@@ -13,6 +13,12 @@
 	    "external_ui": "dashboard"
 	}
     },
+    "http_clients": [
+	{
+	    "tag": "direct",
+	    "detour": "direct"
+	}
+    ],
     "dns": {
         "servers": [
             {
@@ -151,21 +157,21 @@
 		"type": "remote",
 		"format": "binary",
 		"url": "https://fastly.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-cn.srs",
-		"download_detour": "direct"
+		"http_client": "direct"
 	    },
 	    {
 		"tag": "geoip-cn",
 		"type": "remote",
 		"format": "binary",
 		"url": "https://fastly.jsdelivr.net/gh/SagerNet/sing-geoip@rule-set/geoip-cn.srs",
-		"download_detour": "direct"
+		"http_client": "direct"
 	    },
 	    {
 		"tag": "category-ads-all",
 		"type": "remote",
 		"format": "binary",
 		"url": "https://fastly.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-category-ads-all.srs",
-		"download_detour": "direct"
+		"http_client": "direct"
 	    }
 	]
     },
