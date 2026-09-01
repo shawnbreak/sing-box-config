@@ -38,7 +38,7 @@ def parse_args() -> Tuple[bool, bool, bool]:
     parse.add_argument("--update", action='store_true', default=False)
     parse.add_argument("--tun", action='store_true', default=False)
     parse.add_argument("--mixed", action='store_true', default=False)
-    
+
     args = parse.parse_args()
     return args.update, args.tun, args.mixed
 
@@ -83,7 +83,7 @@ def parse_lines(decode_lines: List[str]) -> Tuple[List[dict], List[str]]:
     for line in decode_lines:
         if not line:
             continue
-        
+
         try:
             parse_result: urllib.parse.ParseResult = urllib.parse.urlparse(line)
             parser = parsers.get(parse_result.scheme)
@@ -102,13 +102,13 @@ def parse_lines(decode_lines: List[str]) -> Tuple[List[dict], List[str]]:
     return outbounds, outbound_tags
 
 def parse_sub(sub_name, sub_url, update):
-    
+
     raw = get_sub_raw(sub_name, sub_url, update)
     raw = check_pad(raw)
     lines = decode_as_lines(raw)
     outbounds, outbound_tags = parse_lines(lines)
     return outbounds, outbound_tags
-    
+
 def main():
     update, tun, mixed = parse_args()
     with open(sub_config, "r") as f:
@@ -117,6 +117,22 @@ def main():
 
     subs = sub_json.get("subs")
 
+    """
+    outbounds: [
+       {
+         tag: proxy, type: selector
+       },
+       {
+         tag: byg, type: urltest
+       },
+       {
+          tag: ai, type: selector
+       },
+       {
+          tag: ai_urltest: type: urltest
+       }
+    ]
+    """
     outbounds = []
     proxy_outbounds = []
     ai_outbounds = []
@@ -128,15 +144,10 @@ def main():
         sub_name = sub.get("name")
         sub_url = sub.get("sub_url")
         sub_outbounds, sub_outbound_tags = parse_sub(sub_name, sub_url, update)
-        subs_outbounds.append({
-            "type": "urltest",
-	    "tag": sub_name,
-	    "interval": "3m",
-	    "outbounds": [s.get("tag") for s in sub_outbounds]
-        })
         for o in sub_outbounds:
             subs_outbounds.append(o)
         logger.info(f"{sub_name}: {len(sub_outbounds)}\n{[s.get('tag') for s in sub_outbounds]}")
+
 
     proxy_outbounds.extend([s.get("tag") for s in subs_outbounds])
     for s in subs_outbounds:
@@ -145,7 +156,7 @@ def main():
             if e in s.get("tag"):
                 s_exclude = True
                 break
-            
+
         if not s_exclude:
             ai_outbounds.append(s.get("tag"))
 
@@ -154,16 +165,30 @@ def main():
 	"tag": "direct",
 	"domain_resolver": "local-dns"
     })
-    
+
     outbounds.append({
         "type": "selector",
 	"tag": "proxy",
+	"outbounds": ["proxy_urltest"] + proxy_outbounds
+    })
+
+    outbounds.append({
+        "type": "urltest",
+	"tag": "proxy_urltest",
+        "interval": "3m",
 	"outbounds": proxy_outbounds
     })
 
     outbounds.append({
 	"type": "selector",
 	"tag": "ai",
+	"outbounds": ["ai_urltest"] + ai_outbounds
+    })
+
+    outbounds.append({
+	"type": "urltest",
+	"tag": "ai_urltest",
+        "interval": "3m",
 	"outbounds": ai_outbounds
     })
 
@@ -171,7 +196,7 @@ def main():
 
     with open(config_temp, "r") as f:
         template = json.loads(f.read())
-    
+
     temp_inbounds = template["inbounds"]
     inbounds = []
     for i in temp_inbounds:
@@ -184,7 +209,7 @@ def main():
 
     with open(config_result, "w") as f:
         f.write(json.dumps(template, indent=4, ensure_ascii=False))
-        
+
 
 if __name__ == "__main__":
     main()
