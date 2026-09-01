@@ -1,7 +1,7 @@
 {
     "log": {
 	"disabled": false,
-	"level": "warn",
+	"level": "info",
 	"timestamp": true
     },
     "experimental": {
@@ -92,6 +92,10 @@
 	    {
 		"ip_is_private": true,
 		"outbound": "direct"
+	    },
+	    {
+		"rule_set": ["category-ads-all"],
+		"action": "reject"
 	    },
 	    {
 		"process_name": [

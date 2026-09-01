@@ -25,6 +25,20 @@ sub_config = "./sub.json"
 
 ai_exclude_tag_pattern = [ "香港", "台湾", "菲律宾" ]
 
+# urltest 测速排除的节点地区（质量不稳定/距离过远，避免测速选中烂节点）
+urltest_exclude_tag_pattern = [
+    "尼日利亚", "安哥拉", "埃及", "摩洛哥", "南非",          # 非洲
+    "伊拉克", "卡塔尔", "阿曼", "沙特阿拉伯", "阿联酋", "以色列", "塞浦路斯", "土耳其", "格鲁吉亚",  # 中东
+    "哈萨克斯坦", "乌兹别克斯坦", "巴基斯坦", "孟加拉", "尼泊尔",  # 中亚/南亚
+    "巴西", "墨西哥", "阿根廷", "智利", "哥伦比亚", "秘鲁", "厄瓜多尔", "哥斯达黎加", "乌拉圭",  # 拉美
+    "俄罗斯", "乌克兰", "摩尔多瓦", "马其顿", "阿尔巴尼亚", "塞尔维亚", "罗马尼亚", "保加利亚",
+    "立陶宛", "拉脱维亚", "爱沙尼亚", "斯洛文尼亚", "克罗地亚", "冰岛", "卢森堡",  # 东欧/巴尔干/小国
+]
+
+
+def is_excluded(tag: str, patterns: List[str]) -> bool:
+    return any(p in tag for p in patterns)
+
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
 }
@@ -150,15 +164,16 @@ def main():
 
 
     proxy_outbounds.extend([s.get("tag") for s in subs_outbounds])
-    for s in subs_outbounds:
-        s_exclude = False
-        for e in ai_exclude_tag_pattern:
-            if e in s.get("tag"):
-                s_exclude = True
-                break
 
-        if not s_exclude:
-            ai_outbounds.append(s.get("tag"))
+    # ai 出站候选：排除 ai_exclude_tag_pattern 指定地区
+    ai_outbounds = [s.get("tag") for s in subs_outbounds
+                    if not is_excluded(s.get("tag"), ai_exclude_tag_pattern)]
+
+    # urltest 测速候选：再排除质量不稳定的远距离节点
+    proxy_urltest_outbounds = [t for t in proxy_outbounds
+                               if not is_excluded(t, urltest_exclude_tag_pattern)]
+    ai_urltest_outbounds = [t for t in ai_outbounds
+                            if not is_excluded(t, urltest_exclude_tag_pattern)]
 
     outbounds.append({
 	"type": "direct",
@@ -176,7 +191,8 @@ def main():
         "type": "urltest",
 	"tag": "proxy_urltest",
         "interval": "3m",
-	"outbounds": proxy_outbounds
+        "tolerance": 200,
+	"outbounds": proxy_urltest_outbounds
     })
 
     outbounds.append({
@@ -189,7 +205,9 @@ def main():
 	"type": "urltest",
 	"tag": "ai_urltest",
         "interval": "3m",
-	"outbounds": ai_outbounds
+        "tolerance": 200,
+        "url": "https://cp.cloudflare.com/generate_204",
+	"outbounds": ai_urltest_outbounds
     })
 
     outbounds.extend(subs_outbounds)
