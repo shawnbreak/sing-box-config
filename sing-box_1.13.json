@@ -63,7 +63,7 @@
 		    "rd-server.rd.in.linx",
 		    "icp.rd.in.linx",
 		    "itgitlab.rd.in.linx",
-		    "doc.cd.in.linx"
+		    "doc.cd.linx"
 		],
 		"server": "local-dns"
 	    },
@@ -134,7 +134,7 @@
 		    "rd-server.rd.in.linx",
 		    "icp.rd.in.linx",
 		    "itgitlab.rd.in.linx",
-		    "doc.cd.in.linx"
+		    "doc.cd.linx"
                 ],
 		"action": "route",
 		"outbound": "direct"
