@@ -10,6 +10,7 @@ import re
 import json
 import argparse
 import logging
+import ipaddress
 from sub_parsers import parsers
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,13 @@ urltest_exclude_tag_pattern = [
 
 def is_excluded(tag: str, patterns: List[str]) -> bool:
     return any(p in tag for p in patterns)
+
+def is_ip_address(value: str) -> bool:
+    try:
+        ipaddress.ip_address(value)
+        return True
+    except ValueError:
+        return False
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
@@ -159,6 +167,7 @@ def main():
         sub_url = sub.get("sub_url")
         sub_outbounds, sub_outbound_tags = parse_sub(sub_name, sub_url, update)
         for o in sub_outbounds:
+            o.setdefault("domain_resolver", "ali-dns")
             subs_outbounds.append(o)
         logger.info(f"{sub_name}: {len(sub_outbounds)}\n{[s.get('tag') for s in sub_outbounds]}")
 
@@ -174,6 +183,11 @@ def main():
                                if not is_excluded(t, urltest_exclude_tag_pattern)]
     ai_urltest_outbounds = [t for t in ai_outbounds
                             if not is_excluded(t, urltest_exclude_tag_pattern)]
+    proxy_server_domains = sorted({
+        o.get("server")
+        for o in subs_outbounds
+        if isinstance(o.get("server"), str) and not is_ip_address(o.get("server"))
+    })
 
     outbounds.append({
 	"type": "direct",
@@ -224,6 +238,10 @@ def main():
             inbounds.append(i)
     template["inbounds"] = inbounds
     template["outbounds"] = outbounds
+    template["route"]["rules"].insert(5, {
+        "domain": proxy_server_domains,
+        "outbound": "direct"
+    })
 
     with open(config_result, "w") as f:
         f.write(json.dumps(template, indent=4, ensure_ascii=False))

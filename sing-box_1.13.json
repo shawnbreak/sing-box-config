@@ -37,6 +37,7 @@
 	    {
 		"tag": "ali-dns",
 		"type": "https",
+		"detour": "direct",
 		"server": "223.5.5.5"
 	    },
             {
@@ -52,18 +53,11 @@
 		"server": "ali-dns"
 	    },
 	    {
-		"domain": [
-		    "www.openeuler.com",
-                    "oa.linx-info.com",
-                    "oax.linx-info.com",
-                    "mail.linx-info.com",
-                    "ff.cd.linx",
-                    "xt.rd.in.linx",
-		    "immich.shawnbreak.top",
-		    "rd-server.rd.in.linx",
-		    "icp.rd.in.linx",
-		    "itgitlab.rd.in.linx",
-		    "doc.cd.linx"
+		"domain_suffix": [
+                    "openeuler.com",
+                    "linx-info.com",
+		    "linx",
+                    "shawnbreak.top"
 		],
 		"server": "local-dns"
 	    },
@@ -123,18 +117,11 @@
 		"outbound": "direct"
 	    },
 	    {
-		"domain": [
-		    "www.openeuler.com",
-                    "oa.linx-info.com",
-                    "oax.linx-info.com",
-                    "mail.linx-info.com",
-                    "ff.cd.linx",
-                    "xt.rd.in.linx",
-		    "immich.shawnbreak.top",
-		    "rd-server.rd.in.linx",
-		    "icp.rd.in.linx",
-		    "itgitlab.rd.in.linx",
-		    "doc.cd.linx"
+		"domain_suffix": [
+                    "openeuler.com",
+                    "linx-info.com",
+		    "linx",
+                    "shawnbreak.top"
                 ],
 		"action": "route",
 		"outbound": "direct"
